@@ -78,7 +78,7 @@ body.play #ls{display:block}
  <div class="ttl"><small>Pertahanan Kekaisaran</small><h1>Tahta Abu</h1>
   <p class="sub">Pertahankan istana dari gelombang kegelapan. Semakin lama kamu bertahan, semakin kejam musuhnya.</p></div>
  <div class="mm">
-  <button class="btn" id="b1">Main Solo</button>
+   <button class="btn" id="b1">Main Solo</button>
   <button class="btn" id="b2">Main Berdua (Lokal)</button>
   <button class="btn" id="bo">Main Online (hingga 4 pemain)</button>
  </div>
@@ -1134,7 +1134,110 @@ function cu(dt){const S=G,n=sn;S.t+=dt;S.time+=dt;S.ban=Math.max(0,S.ban-dt);S.s
 const sf=f=>async(...a)=>{try{return await f(...a)}catch(e){st('Gagal: '+(e.code||e.message))}};
 window.NET={get host(){return host},get uid(){return uid},get code(){return code},rl,pub,cu,lobby,leave(){bye();toMenu()},create:sf(create),join:sf(join),begin:sf(begin),sk(){sc++;it=0}};
 </script>
-</body>
+</body><script>
+/* PETA DUNGEON: lantai batu retak, kolam oktagon bercahaya, pilar berapi, sarkofagus, dinding bata, obor, jaring laba-laba */
+(()=>{
+const b=bgc.getContext('2d');
+let sd=20261125;const rr=()=>(sd=(sd*16807)%2147483647)/2147483647;
+const oct=(x,y,r,rot)=>{b.beginPath();for(let i=0;i<8;i++){const a=rot+i*TAU/8,px=x+Math.cos(a)*r,py=y+Math.sin(a)*r;i?b.lineTo(px,py):b.moveTo(px,py)}b.closePath()};
+const GLOW=(x,y,r,rgb,a)=>{const gr=b.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,'rgba('+rgb+','+a+')');gr.addColorStop(1,'rgba('+rgb+',0)');b.fillStyle=gr;b.fillRect(x-r,y-r,r*2,r*2)};
+
+/* ---- lantai batu ---- */
+const PAL=['#2f3038','#34353d','#2b2c33','#383942'];
+for(let y=0;y<WH;y+=40)for(let x=0;x<WW;x+=40){
+ b.fillStyle=PAL[rr()*4|0];b.fillRect(x,y,40,40);
+ b.fillStyle='rgba(255,255,255,.05)';b.fillRect(x,y,40,2);b.fillRect(x,y,2,40);
+ b.fillStyle='rgba(0,0,0,.4)';b.fillRect(x,y+38,40,2);b.fillRect(x+38,y,2,40);
+ const q=rr();
+ if(q<.10){b.strokeStyle='rgba(0,0,0,.45)';b.lineWidth=1.5;b.beginPath();let cx=x+6+rr()*28,cy=y+4+rr()*10;b.moveTo(cx,cy);for(let i=0;i<3;i++){cx+=(rr()-.5)*16;cy+=7+rr()*8;b.lineTo(cx,cy)}b.stroke()}
+ else if(q<.17){for(let i=0;i<4;i++){b.fillStyle='rgba(70,115,60,.35)';b.fillRect(x+4+rr()*28,y+4+rr()*28,4+rr()*6,3+rr()*4)}}
+ else if(q<.2){b.fillStyle='rgba(95,12,22,.28)';b.beginPath();b.ellipse(x+20+(rr()-.5)*10,y+20+(rr()-.5)*10,5+rr()*8,4+rr()*6,rr()*3,0,TAU);b.fill()}
+ else if(q<.3){for(let i=0;i<5;i++){b.fillStyle='rgba(255,255,255,.06)';b.fillRect(x+rr()*36,y+rr()*36,2,2)}}
+}
+/* jalur tengah dari gerbang ke pintu masuk */
+b.fillStyle='rgba(0,0,0,.14)';b.fillRect(740,34,120,WH-34);
+b.fillStyle='rgba(120,230,210,.10)';b.fillRect(742,34,2,WH-34);b.fillRect(856,34,2,WH-34);
+
+/* ---- kolam oktagon di tengah ---- */
+b.save();
+b.setLineDash([10,14]);b.strokeStyle='rgba(120,230,210,.28)';b.lineWidth=2;b.beginPath();b.arc(800,480,160,0,TAU);b.stroke();
+b.setLineDash([]);b.strokeStyle='rgba(120,230,210,.18)';b.beginPath();b.arc(800,480,178,0,TAU);b.stroke();
+oct(800,480,124,TAU/16);b.fillStyle='#14131a';b.fill();b.strokeStyle='#5a5a68';b.lineWidth=6;b.stroke();
+oct(800,480,112,TAU/16);b.fillStyle='#44444f';b.fill();
+oct(800,480,94,TAU/16);b.fillStyle='#0e0e16';b.fill();
+const wg=b.createRadialGradient(800,480,4,800,480,86);wg.addColorStop(0,'#a8fff0');wg.addColorStop(.55,'#35bcb0');wg.addColorStop(1,'#14606a');
+oct(800,480,86,TAU/16);b.fillStyle=wg;b.fill();
+b.strokeStyle='rgba(255,255,255,.28)';b.lineWidth=1.5;
+[20,40,62].forEach(r=>{b.beginPath();b.ellipse(800,480,r,r*.92,0,0,TAU);b.stroke()});
+for(let i=0;i<8;i++){const a=TAU/16+i*TAU/8;b.fillStyle='#6a6a7a';b.fillRect(800+Math.cos(a)*124-5,480+Math.sin(a)*124-5,10,10);b.fillStyle='#8f8ba0';b.fillRect(800+Math.cos(a)*124-5,480+Math.sin(a)*124-5,10,3)}
+b.restore();
+
+/* ---- sarkofagus di dekat dinding ---- */
+const sarc=(x,y)=>{b.fillStyle='rgba(0,0,0,.4)';b.fillRect(x-14,y+30,34,10);b.fillStyle='#4a4756';b.fillRect(x-17,y-38,34,76);b.fillStyle='#6d6a7a';b.fillRect(x-14,y-35,28,70);b.fillStyle='#85829a';b.fillRect(x-14,y-35,28,3);b.fillStyle='#4a4756';b.fillRect(x-10,y-28,20,56);b.fillStyle='#34313e';b.fillRect(x-2,y-22,4,40);b.fillRect(x-8,y-14,16,4)};
+[290,540,780].forEach(y=>{sarc(40,y);sarc(WW-40,y)});
+
+/* ---- tulang, tengkorak, reruntuhan ---- */
+const skull=(x,y)=>{b.strokeStyle='#cfc9b2';b.lineWidth=3;b.beginPath();b.moveTo(x-12,y+8);b.lineTo(x+10,y+12);b.moveTo(x-8,y+14);b.lineTo(x+14,y+6);b.stroke();
+ b.fillStyle='#d9d3bd';b.beginPath();b.arc(x,y,7,0,TAU);b.fill();b.fillRect(x-4,y+3,8,6);b.fillStyle='#14101c';b.fillRect(x-4,y-2,3,3);b.fillRect(x+1,y-2,3,3);b.fillRect(x-1,y+3,2,2)};
+[[300,200],[1250,780],[520,830],[1100,170],[260,640],[1340,420]].forEach(p=>skull(p[0],p[1]));
+const rub=(x,y)=>{for(let i=0;i<9;i++){b.fillStyle=['#55525f','#46434f','#625f70'][i%3];b.fillRect(x+(rr()-.5)*46,y+(rr()-.5)*26,5+rr()*10,4+rr()*7)}};
+[[620,330],[1000,690],[420,470],[1180,540],[700,860]].forEach(p=>rub(p[0],p[1]));
+
+/* ---- gelapkan, lalu cahaya obor dan kolam ---- */
+b.fillStyle='rgba(8,6,16,.34)';b.fillRect(0,0,WW,WH);
+b.globalCompositeOperation='lighter';
+GLOW(800,480,280,'60,220,200',.24);
+[200,400,1200,1400].forEach(x=>GLOW(x,70,190,'255,140,50',.24));
+[400,1200].forEach(x=>GLOW(x,920,190,'255,140,50',.2));
+[160,420,680,880].forEach(y=>[80,1520].forEach(x=>GLOW(x,y-40,150,'255,130,40',.22)));
+b.globalCompositeOperation='source-over';
+
+/* ---- pilar dengan api ---- */
+const flame=(x,y)=>{b.fillStyle='rgba(255,120,40,.35)';b.beginPath();b.arc(x,y,12,0,TAU);b.fill();b.fillStyle='#ff7a2a';b.fillRect(x-5,y-10,10,12);b.fillStyle='#ffd34d';b.fillRect(x-2,y-6,4,8)};
+[160,420,680,880].forEach(y=>[80,1520].forEach(x=>{
+ b.fillStyle='#0e0c14';b.fillRect(x-20,y+18,40,8);
+ b.fillStyle='#6b6878';b.fillRect(x-14,y-26,28,46);b.fillStyle='#8f8ba0';b.fillRect(x-14,y-26,8,46);b.fillStyle='#4a4658';b.fillRect(x-18,y-32,36,8);
+ b.fillStyle='#2a2430';b.fillRect(x-10,y-40,20,8);flame(x,y-44)}));
+
+/* ---- dinding bata ---- */
+const wall=(x,y,w,h)=>{b.fillStyle='#17151e';b.fillRect(x,y,w,h);
+ for(let yy=y,row=0;yy<y+h;yy+=10,row++)for(let xx=x-(row%2?10:0);xx<x+w;xx+=20){
+  const cx=Math.max(x,xx),cw=Math.min(x+w,xx+20)-cx;if(cw<=0)continue;
+  b.fillStyle=['#2c2a37','#322f3d','#282632'][rr()*3|0];b.fillRect(cx+1,yy+1,cw-2,Math.min(8,y+h-yy-1));
+  b.fillStyle='rgba(255,255,255,.07)';b.fillRect(cx+1,yy+1,cw-2,1)}};
+wall(0,0,WW,34);wall(0,0,18,WH);wall(WW-18,0,18,WH);wall(0,WH-12,WW,12);
+let sg=b.createLinearGradient(0,34,0,64);sg.addColorStop(0,'rgba(0,0,0,.55)');sg.addColorStop(1,'rgba(0,0,0,0)');b.fillStyle=sg;b.fillRect(18,34,WW-36,30);
+sg=b.createLinearGradient(18,0,48,0);sg.addColorStop(0,'rgba(0,0,0,.5)');sg.addColorStop(1,'rgba(0,0,0,0)');b.fillStyle=sg;b.fillRect(18,34,30,WH-46);
+sg=b.createLinearGradient(WW-18,0,WW-48,0);sg.addColorStop(0,'rgba(0,0,0,.5)');sg.addColorStop(1,'rgba(0,0,0,0)');b.fillStyle=sg;b.fillRect(WW-48,34,30,WH-46);
+/* ceruk gerbang dengan tengkorak */
+b.fillStyle='#14121a';b.fillRect(756,0,88,34);b.fillStyle='#3a3748';b.fillRect(756,0,88,4);b.fillRect(756,0,4,34);b.fillRect(840,0,4,34);
+b.fillStyle='#d9d3bd';b.beginPath();b.arc(800,14,8,0,TAU);b.fill();b.fillRect(796,18,8,8);b.fillStyle='#14101c';b.fillRect(795,11,4,4);b.fillRect(802,11,4,4);
+/* obor dinding */
+const torch=(x,y)=>{b.fillStyle='#3a2a1a';b.fillRect(x-2,y+6,4,10);b.fillStyle='#5a4630';b.fillRect(x-6,y+2,12,5);flame(x,y)};
+[200,400,1200,1400].forEach(x=>torch(x,18));[400,1200].forEach(x=>torch(x,WH-6));
+/* rantai dan jaring laba-laba */
+[300,560,1040,1300].forEach(x=>{for(let i=0;i<5;i++){b.fillStyle=i%2?'#6a6676':'#8a8698';b.fillRect(x-2,34+i*7,4,6)}});
+const web=(x,y,sx,sy)=>{b.strokeStyle='rgba(230,230,240,.35)';b.lineWidth=1;
+ for(let i=0;i<5;i++){const a=i/4*Math.PI/2;b.beginPath();b.moveTo(x,y);b.lineTo(x+sx*Math.cos(a)*46,y+sy*Math.sin(a)*46);b.stroke()}
+ for(let r=14;r<=46;r+=16){b.beginPath();for(let i=0;i<5;i++){const a=i/4*Math.PI/2,k=r*(i%2?.8:1),px=x+sx*Math.cos(a)*k,py=y+sy*Math.sin(a)*k;i?b.lineTo(px,py):b.moveTo(px,py)}b.stroke()}};
+web(18,34,1,1);web(WW-18,34,-1,1);web(18,WH-12,1,-1);web(WW-18,WH-12,-1,-1);
+
+/* ---- vinyet gelap di tepi ---- */
+const vg=b.createRadialGradient(800,480,380,800,480,1000);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.55)');b.fillStyle=vg;b.fillRect(0,0,WW,WH);
+})();
+
+/* gerbang menjadi pintu batu dengan portal biru kehijauan */
+drawGate=function(S){
+ if(!S.gate)return;
+ const x=800,y=36,w=56,h=44,o=Math.min(1,S.gt/.8),p=.5+.5*Math.sin(S.t*4);
+ g.fillStyle='rgba(90,230,210,'+(.14+.1*p)+')';g.beginPath();g.arc(x,y+h-6,56+8*p,0,TAU);g.fill();
+ g.fillStyle='#0c0a10';g.fillRect(x-w/2-8,y-6,w+16,h+10);
+ g.fillStyle='#6b6878';g.fillRect(x-w/2-6,y-4,w+12,h+6);g.fillStyle='#8f8ba0';g.fillRect(x-w/2-6,y-4,w+12,3);
+ g.fillStyle='#7ff5e0';g.fillRect(x-w/2,y+2,w,h-2);g.fillStyle='#d8fff8';g.fillRect(x-4,y+2,8,h-2);
+ const dw=(w/2)*(1-o);g.fillStyle='#2a2430';g.fillRect(x-w/2,y+2,dw,h-2);g.fillRect(x+w/2-dw,y+2,dw,h-2);
+ g.fillStyle='#4a4658';g.fillRect(x-w/2,y+2,dw,3);g.fillRect(x+w/2-dw,y+2,dw,3);
+ const bb=Math.round(Math.sin(S.t*6)*3);g.fillStyle='#7ff5e0';g.fillRect(x-6,y+h+8+bb,12,4);g.fillRect(x-4,y+h+12+bb,8,4);g.fillRect(x-2,y+h+16+bb,4,4)};
+</script>
  <script>
 /* PENYEMBUH SUCI */
 CL.healer.n='Penyembuh Suci';CL.healer.sn='Suci';
@@ -1842,4 +1945,5 @@ drawP=function(p){
  try{_dpMg(p)}finally{p.name=nm}
  g.font='12px "Pixelify Sans",monospace';g.textAlign='center';g.fillStyle='#000';g.fillText(nm,p.x+1,p.y-105+1);g.fillStyle=p.i?'#9fe0a0':'#ffd98a';g.fillText(nm,p.x,p.y-105);
 };
-</script></html>
+</script>
+</html>
